@@ -1,2 +1,0 @@
-Semantic Versioning;
-portquiz.net:(porta desejada)
