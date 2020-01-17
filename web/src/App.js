@@ -1,8 +1,12 @@
-import React/*, {useState}*/ from 'react';
+import React, {useState, useEffect}/*, {useState}*/ from 'react';
+import api from './services/api';
+
 import './global.css';
 import './app.css';
 import './sidebar.css';
 import './main.css';
+
+
 
 // import Header from './Header';
 
@@ -19,33 +23,108 @@ function App() {
   function decrementCounter() {
     setCounter(counter - 1); 
   }*/
+  const [devs, setDevs] = useState([])
+
+  const [github_username, setGithub_username] = useState('');
+  const [techs, setTechs] = useState('');
+
+  const [latitude, setlatitude] = useState('');
+  const [longitude, setlongitude] = useState('');
+
+  
+
+  useEffect(()=>{
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const {latitude, longitude } = position.coords;
+
+        setlatitude(latitude);
+        setlongitude(longitude);
+
+
+      },
+      (err) => {
+        console.log(err);
+      },
+      {
+        timeout: 30000
+      }
+
+    )
+  }, []);
+  
+  useEffect(() =>{
+    async function loadDevs() {
+      const response = await api.get('/devs');
+
+      setDevs(response.data);
+    }
+
+    loadDevs();
+  }, []);
+
+  async function handleAddDev(e) {
+    e.preventDefault();
+
+    const response = await api.post('/devs', {
+      github_username,
+      techs,
+      latitude,
+      longitude,
+    });
+
+    setGithub_username('');
+    setTechs('');
+  }
 
   return (
 
     <div id="app">
       <aside>
         <strong>Cadastrar</strong>
-        <form>
+        <form onSubmit={handleAddDev}>
           <div className="input-block">
             <label htmlFor="github_username">Usuário do Github</label>
-            <input name="github_username" id="github_username" required/>
+            <input name="github_username" 
+            id="github_username" 
+            required
+            value={github_username}
+            onChange={e => setGithub_username(e.target.value)}
+            />
           </div>
 
           <div className="input-block">
             <label htmlFor="techs">Tecnologias</label>
-            <input name="techs" id="techs" required/>
+            <input name="techs"
+              id="techs"
+              required
+              value={techs}
+              onChange={e => setTechs(e.target.value)}
+              />
           </div>
           
           
           <div className="input-group">
             <div className="input-block">
               <label htmlFor="latitude">Latitude</label>
-              <input name="latitude" id="latitude" required/>
+              <input type="number" 
+              name="latitude" 
+              id="latitude" 
+              required 
+              value={latitude}
+              onChange={e => setlatitude(e.target.value)}
+              />
             </div>
 
             <div className="input-block">
               <label htmlFor="longitude">Longitude</label>
-              <input name="longitude" id="longitude" required/>
+              <input type="number" 
+              name="longitude" 
+              id="longitude" 
+              required 
+              value={longitude}
+              onChange={e => setlongitude(e.target.value)}
+              />
             </div>
           </div>
 
@@ -55,64 +134,23 @@ function App() {
 
       <main>
         <ul>
-          <li className="dev-item">
+          {devs.map(dev => (<li className="dev-item">
             <header>
-              <img src="https://avatars0.githubusercontent.com/u/14254545?s=400&u=f69cff6ceff20f8a73698f2b32592c9bd4b7fcc2&v=4" alt="Faran"/>
+              <img src={dev.avatar_url} alt={dev.name}/>
               <div className="user-info">
-                <strong>Franklyn Venancio Rocha</strong>
-                <span>Node.JS, ReactJS</span>
+                <strong>{dev.name}</strong>
+                <span>{dev.techs.join(', ')}</span>
               </div>
             </header>
-            <p>Aprendendo a desenvolver</p>
-            <a href="https://github.com/Faran42"> Acessar perfil no Github</a>
+            <p>{dev.bio}</p>
+            <a href={`https://github.com/${dev.github_username}`}> Acessar perfil no Github</a>
           </li>
-
-          <li className="dev-item">
-            <header>
-              <img src="https://avatars0.githubusercontent.com/u/14254545?s=400&u=f69cff6ceff20f8a73698f2b32592c9bd4b7fcc2&v=4" alt="Faran"/>
-              <div className="user-info">
-                <strong>Franklyn Venancio Rocha</strong>
-                <span>Node.JS, ReactJS</span>
-              </div>
-            </header>
-            <p>Aprendendo a desenvolver</p>
-            <a href="https://github.com/Faran42"> Acessar perfil no Github</a>
-          </li>
-
-          <li className="dev-item">
-            <header>
-              <img src="https://avatars0.githubusercontent.com/u/14254545?s=400&u=f69cff6ceff20f8a73698f2b32592c9bd4b7fcc2&v=4" alt="Faran"/>
-              <div className="user-info">
-                <strong>Franklyn Venancio Rocha</strong>
-                <span>Node.JS, ReactJS</span>
-              </div>
-            </header>
-            <p>Aprendendo a desenvolver</p>
-            <a href="https://github.com/Faran42"> Acessar perfil no Github</a>
-          </li>
-
-          <li className="dev-item">
-            <header>
-              <img src="https://avatars0.githubusercontent.com/u/14254545?s=400&u=f69cff6ceff20f8a73698f2b32592c9bd4b7fcc2&v=4" alt="Faran"/>
-              <div className="user-info">
-                <strong>Franklyn Venancio Rocha</strong>
-                <span>Node.JS, ReactJS</span>
-              </div>
-            </header>
-            <p>Aprendendo a desenvolver</p>
-            <a href="https://github.com/Faran42"> Acessar perfil no Github</a>
-          </li>
+          ))}          
         </ul>
       </main>
     </div>
 
-
-
-
-
-
-
-    /*<>
+/*<>
       {/* <Header title="Titulo 1" />
       <Header title="Titulo 2" />
       <Header title="Titulo 4" /> '*'/}
@@ -121,11 +159,6 @@ function App() {
       <button onClick={decrementCounter}>Incrementar</button>  
     </>
     */
-
-
-
-
-
   );
 }
 

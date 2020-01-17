@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 const routes = require('./routes');
 
 const port = 3333
@@ -12,8 +13,9 @@ mongoose.connect('mongodb+srv://omnistack:omnistack@cluster0-av1sg.gcp.mongodb.n
 
 const app = express();
 
+app.use(cors());
 // .use significa dizer que o parâmetro passado sera usado em todas as rotas da aplicação
-app.use(express.json())
+app.use(express.json());
 
 app.use(routes);
 

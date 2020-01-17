@@ -17,21 +17,20 @@ module.exports = {
         return response.json(devs);
     },
 
-    async store (request, response) {        
+    async store (request, response) {    
+         
         const { github_username, techs, latitude, longitude } = request.body;
-    
-        let dev = await Dev.find({ github_username }); //busca pelo username do dev no db
-
+        
+        let dev = await Dev.findOne({ github_username }); //busca pelo username do dev no db
+        
         if(!dev) { //evita repetição de cadastros
-
+            
             // (`${}`) Template Strings
             //await aguarda a resposa da função com a flag async
 
-            const apiResponse = await axios.get(`https://api.github.com/users/${github_username}`);
+            const apiResponse = await axios.get(`https://api.github.com/users/${github_username}`);            
         
-            const { name = login, avatar_url, bio } = apiResponse.data;
-        
-            
+            const { name = login, avatar_url, bio } = apiResponse.data;                        
 
             const techsArray = parseStringAsArray(techs)
         
@@ -50,7 +49,7 @@ module.exports = {
                 techs: techsArray,
                 location
             });
-        }
+        };
 
         return response.json(dev);
     },

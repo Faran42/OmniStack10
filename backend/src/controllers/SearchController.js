@@ -16,13 +16,13 @@ module.exports = {
             location: {
                 $near: {
                     $geometry: {
-                        type: 'point',
+                        type: 'Point',
                         coordinates: [longitude, latitude],
                     },
-                    $maxdistance: 10000,
+                    $maxDistance: 10000,
                 },
             },
-        }).
+        });
 
         console.log(techsArray)
 
